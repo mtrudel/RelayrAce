@@ -9,7 +9,7 @@ class RelayrAce
 
   def initialize(port)
     @port = port
-    @serial = SerialPort.new(port, 115200)
+    @serial = SerialPort.new(port, 115200, 8, 1, SerialPort::NONE)
     @serial.extend(MonitorMixin)
   end
   
@@ -19,7 +19,7 @@ class RelayrAce
   end
   
   def get_relay(relay)
-    send_cmd("REL#{relay}.GET")
+    abort "Reads aren't working yet"
   end
   
   def set_relay(relay, value)
@@ -35,7 +35,7 @@ class RelayrAce
   end
 
   def get_channel(channel)
-    send_cmd("CH#{channel}.GET")
+    abort "Reads aren't working yet"
   end
   
   def set_channel(channel, value)
@@ -48,8 +48,7 @@ class RelayrAce
   
   def send_cmd(cmd)
     @serial.synchronize do
-      @serial.write("\r\n#{cmd}\r\n")
-      @serial.read
+      @serial.write("\r\n#{cmd}\r\n")    
     end
-  end
+  end  
 end
