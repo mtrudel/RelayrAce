@@ -3,7 +3,7 @@ require 'serialport'
 
 class RelayrAce
   
-  Version = '0.0.2'
+  Version = '0.0.3'
 
   attr_reader :port
 
@@ -19,7 +19,7 @@ class RelayrAce
   end
   
   def get_relay(relay)
-    abort "Reads aren't working yet"
+    raise "Reads aren't working yet"
   end
   
   def set_relay(relay, value)
@@ -35,11 +35,11 @@ class RelayrAce
   end
 
   def get_channel(channel)
-    abort "Reads aren't working yet"
+    raise "Reads aren't working yet"
   end
   
   def set_channel(channel, value)
-    send_cmd("CH#{channel}.#{(value)? 'ON' : 'OFF'}")    
+    send_cmd("CH#{channel}.#{(value)? 'ON' : 'OFF'}")
   end
   
   def toggle_channel(channel)
@@ -48,7 +48,9 @@ class RelayrAce
   
   def send_cmd(cmd)
     @serial.synchronize do
-      @serial.write("\r\n#{cmd}\r\n")    
+      @serial.write("\r\n")
+      2.times { @serial.getc == ':' }
+      @serial.write("#{cmd}\r\n")
     end
   end  
 end
