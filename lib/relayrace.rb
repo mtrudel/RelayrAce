@@ -1,16 +1,12 @@
 require 'monitor'
 require 'serialport'
+require 'system_timer'
 
 class RelayrAce
-  
-  Version = '0.0.3'
-
-  attr_reader :port
-
-  def initialize(port)
+  def initialize(port, logger = nil)
     @port = port
-    @serial = SerialPort.new(port, 115200, 8, 1, SerialPort::NONE)
-    @serial.extend(MonitorMixin)
+    @logger = logger
+    open_serial_port
   end
   
   def close 
@@ -48,9 +44,24 @@ class RelayrAce
   
   def send_cmd(cmd)
     @serial.synchronize do
-      @serial.write("\r\n")
-      2.times { @serial.getc == ':' }
-      @serial.write("#{cmd}\r\n")
+      begin
+        SystemTimer.timeout_after(10) do
+          @serial.write("\r\n")
+          until @serial.getc == ':' end
+          @serial.getc # Swallow the next ':'
+          @serial.write("#{cmd}\r\n")
+        end
+      rescue Timeout::Error
+        @logger.warn "Reopening serial port due to timeout" if @logger
+        open_serial_port
+      end
     end
   end  
+  
+  private
+  def open_serial_port
+    @serial.close if @serial
+    @serial = SerialPort.new(@port, 115200, 8, 1, SerialPort::NONE)
+    @serial.extend(MonitorMixin)
+  end
 end
