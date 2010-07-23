@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{relayrace}
-  s.version = "1.0.1"
+  s.version = "1.0.2"
   s.date = %q{2010-07-23}
   s.authors = ["Mat Trudel"]
   s.email = %q{mat@geeky.net}
