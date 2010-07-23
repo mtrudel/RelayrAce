@@ -47,8 +47,7 @@ class RelayrAce
       begin
         SystemTimer.timeout_after(10) do
           @serial.write("\r\n")
-          until @serial.getc == ':' end
-          @serial.getc # Swallow the next ':'
+          2.times { @serial.getc == ':' }
           @serial.write("#{cmd}\r\n")
         end
       rescue Timeout::Error
@@ -61,6 +60,7 @@ class RelayrAce
   private
   def open_serial_port
     @serial.close if @serial
+    sleep 1 # Give the OS a chance to catch up
     @serial = SerialPort.new(@port, 115200, 8, 1, SerialPort::NONE)
     @serial.extend(MonitorMixin)
   end
